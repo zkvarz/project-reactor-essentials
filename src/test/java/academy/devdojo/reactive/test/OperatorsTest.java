@@ -156,7 +156,7 @@ public class OperatorsTest {
     @Test
     public void subscribeOnIOWithError() {
         Mono<List<String>> list = Mono.fromCallable(() -> Files.readAllLines(Path.of("text-file12")))
-            //TODO 'Error is' log present but if comment out log() and then execute it's absent ... Any reason ?
+            //TODO 'Error is' log present only if comment out log() and then execute Any reason ?
             .log()
             .subscribeOn(Schedulers.boundedElastic())
             .doOnError(i -> {
