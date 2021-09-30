@@ -1,11 +1,13 @@
 package academy.devdojo.reactive.test;
 
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
@@ -148,6 +150,30 @@ public class OperatorsTest {
             return true;
         })
         .verifyComplete();
+
+    }
+
+    @Test
+    public void subscribeOnIOWithError() {
+        Mono<List<String>> list = Mono.fromCallable(() -> Files.readAllLines(Path.of("text-file12")))
+            //TODO 'Error is' log present but if comment out log() and then execute it's absent ... Any reason ?
+            .log()
+            .subscribeOn(Schedulers.boundedElastic())
+            .doOnError(i -> {
+                    log.info("Error is {}", i.getMessage());
+                }
+            );
+
+        list.subscribe(s -> log.info("{}", s));
+
+/*        StepVerifier.create(list)
+        .expectSubscription()
+        .thenConsumeWhile(l -> {
+            Assertions.assertFalse(l.isEmpty());
+            log.info("Size {}",l.size());
+            return true;
+        })
+        .verifyComplete();*/
 
     }
 }
